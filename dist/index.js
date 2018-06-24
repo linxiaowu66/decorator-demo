@@ -1,4 +1,3 @@
-'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -54,7 +53,7 @@ function _initializerWarningHelper(descriptor, context) {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function inject1(target, name, descriptor) {
-  console.log(target, name, descriptor);
+  console.log('inject1 decorator...', target, name, descriptor);
   return {
     enumerable: false,
     configurable: true,
@@ -69,7 +68,7 @@ function inject(target, name, descriptor) {
   var initializer = descriptor.initializer;
 
 
-  console.log('inject...', initializer);
+  console.log('inject decorator...', initializer);
 
   return {
     enumerable: false,
@@ -79,6 +78,26 @@ function inject(target, name, descriptor) {
       return function () {
         console.log('this is called by inject initializer');
       };
+    }
+  };
+}
+
+function inject2(target, name, descriptor) {
+  var _this = this;
+
+  return {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    // value: function(...args) {
+    //   descriptor.value.apply(this, args)
+    // }
+    value: function value() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      descriptor.value.apply(_this, args);
     }
   };
 }
@@ -93,20 +112,31 @@ var B = (_class = function (_A) {
   function B() {
     var _ref;
 
-    var _temp, _this, _ret;
+    var _temp, _this2, _ret;
 
     _classCallCheck(this, B);
 
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = B.__proto__ || Object.getPrototypeOf(B)).call.apply(_ref, [this].concat(args))), _this), _initDefineProp(_this, 'method', _descriptor, _this), _temp), _possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this2 = _possibleConstructorReturn(this, (_ref = B.__proto__ || Object.getPrototypeOf(B)).call.apply(_ref, [this].concat(args))), _this2), _this2.val = 10, _initDefineProp(_this2, 'method', _descriptor, _this2), _temp), _possibleConstructorReturn(_this2, _ret);
   }
 
   _createClass(B, [{
     key: 'method1',
     value: function method1() {}
+  }, {
+    key: 'method2',
+    value: function method2() {
+      this.val = 100;
+      console.log(this.val);
+    }
+  }, {
+    key: 'method3',
+    value: function method3() {
+      console.log(this);
+    }
   }]);
 
   return B;
@@ -115,12 +145,15 @@ var B = (_class = function (_A) {
   initializer: function initializer() {
     return function () {};
   }
-}), _applyDecoratedDescriptor(_class.prototype, 'method1', [inject1], Object.getOwnPropertyDescriptor(_class.prototype, 'method1'), _class.prototype)), _class);
+}), _applyDecoratedDescriptor(_class.prototype, 'method1', [inject1], Object.getOwnPropertyDescriptor(_class.prototype, 'method1'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'method2', [inject2], Object.getOwnPropertyDescriptor(_class.prototype, 'method2'), _class.prototype)), _class);
 
 
 var inis = new B();
 
-console.log(inis.method);
 inis.method();
 
 inis.method1();
+
+inis.method2();
+
+inis.method3();

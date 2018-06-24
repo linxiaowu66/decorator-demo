@@ -23,6 +23,20 @@ function inject(target, name, descriptor) {
   }
 }
 
+function inject2(target, name, descriptor) {
+  return {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    // value: function(...args) {
+    //   descriptor.value.apply(this, args)
+    // }
+    value: (...args) => {
+      descriptor.value.apply(this, args)
+    }
+  }
+}
+
 class A {
   constructor() {
   }
@@ -30,10 +44,19 @@ class A {
 
 
 class B extends A {
+  val = 10
   @inject
   method = () => {}
   @inject1
   method1() {}
+  @inject2
+  method2() {
+    this.val = 100
+    console.log(this.val)
+  }
+  method3() {
+    console.log(this)
+  }
 }
 
 const inis = new B()
@@ -41,3 +64,7 @@ const inis = new B()
 inis.method()
 
 inis.method1()
+
+inis.method2()
+
+inis.method3()
